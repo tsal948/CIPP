@@ -8,6 +8,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  TextField,
   Typography,
   Box,
   Stack,
@@ -35,6 +36,7 @@ export const CippAlertSnoozeDialog = ({
   relatedQueryKeys,
 }) => {
   const [duration, setDuration] = useState('7')
+  const [reason, setReason] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
   const snoozeRequest = ApiPostCall({
@@ -50,6 +52,7 @@ export const CippAlertSnoozeDialog = ({
         TenantFilter: tenantFilter,
         AlertItem: alertItem,
         Duration: parseInt(duration, 10),
+        Reason: reason,
       },
     })
   }
@@ -58,6 +61,7 @@ export const CippAlertSnoozeDialog = ({
     setSubmitted(false)
     snoozeRequest.reset()
     setDuration('7')
+    setReason('')
     onClose()
   }
 
@@ -82,7 +86,9 @@ export const CippAlertSnoozeDialog = ({
               bgcolor: 'action.hover',
             }}
           >
-            <Typography variant="overline" color="text.secondary">
+            <Typography variant="overline" sx={{
+              color: "text.secondary"
+            }}>
               {alertLabel}
             </Typography>
             {fields.length > 0 ? (
@@ -91,9 +97,11 @@ export const CippAlertSnoozeDialog = ({
                   <Box key={field.label} sx={{ display: 'flex', gap: 1.5 }}>
                     <Typography
                       variant="caption"
-                      color="text.secondary"
-                      sx={{ minWidth: 104, flexShrink: 0 }}
-                    >
+                      sx={{
+                        color: "text.secondary",
+                        minWidth: 104,
+                        flexShrink: 0
+                      }}>
                       {field.label}
                     </Typography>
                     <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
@@ -111,7 +119,12 @@ export const CippAlertSnoozeDialog = ({
         )}
         {!submitted ? (
           <Box sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mb: 1
+              }}>
               Choose how long to snooze this specific alert item. It will not trigger notifications
               until the snooze expires.
             </Typography>
@@ -125,6 +138,16 @@ export const CippAlertSnoozeDialog = ({
                 />
               ))}
             </RadioGroup>
+            <TextField
+              label="Reason (optional)"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              fullWidth
+              multiline
+              minRows={2}
+              sx={{ mt: 2 }}
+              placeholder="Why is this alert being snoozed?"
+            />
           </Box>
         ) : (
           <CippApiResults apiObject={snoozeRequest} />
@@ -139,5 +162,5 @@ export const CippAlertSnoozeDialog = ({
         )}
       </DialogActions>
     </Dialog>
-  )
+  );
 }
