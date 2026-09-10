@@ -1,0 +1,102 @@
+import { CippDataTable } from "../CippTable/CippDataTable";
+import { CippIcons } from "../../utils/icon-registry"
+
+export const CippTenantResults = (props) => {
+  const { importReport = false } = props;
+  return (
+    <>
+      {importReport?.Results?.length > 0 && (
+        <>
+          <CippDataTable
+            title="Imported Report"
+            noCard={true}
+            data={importReport.Results}
+            actions={[]}
+            simpleColumns={[
+              "TenantName",
+              "TenantType",
+              "LastRun",
+              "GraphStatus",
+              "ExchangeStatus",
+              "MissingRoles",
+              "AssignedRoles",
+            ]}
+            offCanvas={{
+              extendedInfoFields: [
+                "TenantName",
+                "TenantId",
+                "TenantType",
+                "DefaultDomainName",
+                "ServiceAccount",
+                "ServiceAccountLastAuth",
+                "LastRun",
+                "GraphTest",
+                "ExchangeTest",
+                "OrgManagementRepairNeeded",
+                "OrgManagementRoles",
+                "OrgManagementRolesMissing",
+              ],
+            }}
+          />
+        </>
+      )}
+      {!importReport && (
+        <CippDataTable
+          title="Tenant Results"
+          noCard={true}
+          api={{
+            url: "/api/ExecAccessChecks",
+            data: { Type: "Tenants" },
+            dataKey: "Results",
+            queryKey: "ExecAccessChecks-Tenants",
+          }}
+          actions={[
+            {
+              label: "Check Tenant",
+              type: "POST",
+              url: "/api/ExecAccessChecks?Type=Tenants",
+              data: { TenantId: "TenantId" },
+              icon: <CippIcons.Sync />,
+              confirmText: "Execute the access check for the selected tenant(s)?",
+              relatedQueryKeys: "ExecAccessChecks-Tenants",
+              multiPost: false,
+            },
+            {
+              label: "Repair Exchange Roles",
+              type: "POST",
+              url: "/api/ExecExchangeRoleRepair",
+              data: { TenantId: "TenantId" },
+              icon: <CippIcons.Plumbing />,
+              confirmText: "Repair Exchange roles for [TenantName]?",
+              condition: (row) => row.OrgManagementRepairNeeded === true,
+            },
+          ]}
+          simpleColumns={[
+            "TenantName",
+            "TenantType",
+            "ServiceAccount",
+            "LastRun",
+            "GraphStatus",
+            "ExchangeStatus",
+            "MissingRoles",
+            "AssignedRoles",
+          ]}
+          offCanvas={{
+            extendedInfoFields: [
+              "TenantName",
+              "TenantId",
+              "TenantType",
+              "DefaultDomainName",
+              "ServiceAccount",
+              "ServiceAccountLastAuth",
+              "LastRun",
+              "GraphTest",
+              "ExchangeTest",
+            ],
+          }}
+        />
+      )}
+    </>
+  );
+};
+
